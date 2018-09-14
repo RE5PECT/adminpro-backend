@@ -36,6 +36,30 @@ app.get('/', (req, res, next) => {
         });
 });
 
+
+// ==============================================
+// Obtener  Hospital por id
+// ==============================================
+app.get('/:id', (req, res, next) => {
+
+   var id = req.params.id;
+
+   Hospital.findById(id, (err, hospital)=>{
+       if (err){
+           return res.status(500).json({
+               ok:false,
+               mensaje: 'No se encuentra hospital',
+               errors: err
+           });
+         }
+
+         res.status(200).json({
+             ok:true,
+             hospital
+         })
+   })
+});
+
 // ==============================================
 // Crear nuevo Hospital
 // ==============================================

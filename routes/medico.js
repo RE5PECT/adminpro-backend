@@ -24,14 +24,50 @@ app.get('/', (req, res, next) => {
                     errors: err
                 });
             }
-            Medico.count({}, (err,conteo) =>{
+            Medico.count({}, (err, conteo) => {
                 res.status(200).json({
                     ok: true,
                     medicos: medicos,
                     total: conteo
                 });
             });
-            
+
+        });
+});
+
+
+// ==============================================
+// Obtener medico
+// ==============================================
+app.get('/:id', (req, res, next) => {
+
+    var id = req.params.id;
+
+    Medico.findById(id)
+        .populate('usuario', 'nombre email')
+        .populate('hospital')
+        .exec((err, medico) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando medico',
+                    errors: err
+                });
+            }
+
+            if (!medico) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El medico con id ' + id + ' no existe.',
+                    errors: err
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                medico: medico
+            });
+
+
         });
 });
 
@@ -48,7 +84,7 @@ app.post('/', middlewareAuth, (req, res) => {
         nombre: body.nombre,
         img: body.img,
         usuario: req.usuario._id,
-        hospital: body.hospital_id
+        hospital: body.hospital
     });
 
     medico.save((err, medicoSaved) => {
@@ -98,7 +134,7 @@ app.put('/:id', middlewareAuth, (req, res) => {
 
         medico.nombre = body.nombre;
         medico.img = body.img;
-        medico.hospital = body.hospital_id;
+        medico.hospital = body.hospital;
 
         medico.save((err, medicoSaved) => {
             if (err) {
